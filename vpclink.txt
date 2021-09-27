@@ -1,0 +1,23 @@
+cat > vpclink.yaml<<EOF
+apiVersion: apigatewayv2.services.k8s.aws/v1alpha1
+kind: VPCLink
+metadata:
+  name: nlb-internal
+spec:
+  name: nlb-internal
+  securityGroupIDs: 
+	- $ps_vpclink_sg
+  subnetIDs: 
+	- $(aws ec2 describe-subnets \
+		  --filter Name=tag:kubernetes.io/role/internal-elb,Values=1 \
+		  --query 'Subnets[0].SubnetId' \
+		  --region us-west-2 --output text)
+	- $(aws ec2 describe-subnets \
+		  --filter Name=tag:kubernetes.io/role/internal-elb,Values=1 \
+		  --query 'Subnets[1].SubnetId' \
+		  --region us-west-2 --output text)
+	- $(aws ec2 describe-subnets \
+		  --filter Name=tag:kubernetes.io/role/internal-elb,Values=1 \
+		  --query 'Subnets[2].SubnetId' \
+		  --region us-west-2 --output text)
+EOF
