@@ -5,6 +5,6 @@ metadata:
   name: "apiv1"
 spec:
   apiID: $(kubectl get apis.apigatewayv2.services.k8s.aws api-appstore -o=jsonpath='{.status.apiID}')
-  stageName: api
+  stageName: dev
   autoDeploy: true
 " | kubectl apply -f -

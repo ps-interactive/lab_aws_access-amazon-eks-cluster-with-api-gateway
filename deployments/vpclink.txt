@@ -2,9 +2,9 @@ cat > vpclink.yaml<<EOF
 apiVersion: apigatewayv2.services.k8s.aws/v1alpha1
 kind: VPCLink
 metadata:
-  name: store-vpclink-nlb
+  name: nlb-internal
 spec:
-  name: store-vpclink-nlb
+  name: nlb-internal
   securityGroupIDs: 
     - $PS_VPCLINK_SG
   subnetIDs: 
