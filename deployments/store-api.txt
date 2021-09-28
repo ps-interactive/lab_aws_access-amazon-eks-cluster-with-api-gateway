@@ -1,0 +1,39 @@
+cat > store-api.yaml<<EOF
+apiVersion: apigatewayv2.services.k8s.aws/v1alpha1
+kind: API
+metadata:
+  name: api-appstore
+spec:
+  body: '{
+              "openapi": "3.0.1",
+              "info": {
+                "title": "api-appstore",
+                "version": "v1"
+              },
+              "paths": {
+              "/book": {
+                  "get": {
+                    "x-amazon-apigateway-integration": {
+                       "uri" : "$(aws elbv2 describe-listeners \
+  --load-balancer-arn $(aws elbv2 describe-load-balancers \
+  --region us-west-2 \
+  --query "LoadBalancers[?contains(DNSName, '$(kubectl get service books-svc \
+  -o jsonpath="{.status.loadBalancer.ingress[].hostname}")')].LoadBalancerArn" \
+  --output text) \
+  --region us-west-2 \
+  --query "Listeners[0].ListenerArn" \
+  --output text)",
+                      "httpMethod": "GET",
+                      "connectionId": "$(kubectl get vpclinks.apigatewayv2.services.k8s.aws \
+  nlb-internal \
+  -o jsonpath="{.status.vpcLinkID}")",
+                      "type": "HTTP_PROXY",
+                      "connectionType": "VPC_LINK",
+                      "payloadFormatVersion": "1.0"
+                    }
+                  }
+                }
+              },
+              "components": {}
+        }'
+EOF
